@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	"github.com/ipfs/go-ipfs/core"
+	"go.opentelemetry.io/otel"
 
 	"github.com/ipfs/go-ipfs/core/coreunix"
 
@@ -55,6 +56,9 @@ func getOrCreateNilNode() (*core.IpfsNode, error) {
 // Add builds a merkledag node from a reader, adds it to the blockstore,
 // and returns the key representing that node.
 func (api *UnixfsAPI) Add(ctx context.Context, files files.Node, opts ...options.UnixfsAddOption) (path.Resolved, error) {
+	ctx, span := otel.Tracer("").Start(ctx, "UnixfsAPI-Add")
+	defer span.End()
+
 	settings, prefix, err := options.UnixfsAddOptions(opts...)
 	if err != nil {
 		return nil, err
@@ -179,6 +183,8 @@ func (api *UnixfsAPI) Add(ctx context.Context, files files.Node, opts ...options
 }
 
 func (api *UnixfsAPI) Get(ctx context.Context, p path.Path) (files.Node, error) {
+	ctx, span := otel.Tracer("").Start(ctx, "UnixFSGet")
+	defer span.End()
 	ses := api.core().getSession(ctx)
 
 	nd, err := ses.ResolveNode(ctx, p)
