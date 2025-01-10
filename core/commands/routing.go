@@ -70,7 +70,7 @@ var findProvidersRoutingCmd = &cmds.Command{
 
 		numProviders, _ := req.Options[numProvidersOptionName].(int)
 		if numProviders < 1 {
-			return fmt.Errorf("number of providers must be greater than 0")
+			return errors.New("number of providers must be greater than 0")
 		}
 
 		c, err := cid.Parse(req.Arguments[0])
@@ -426,7 +426,7 @@ identified by QmFoo.
 		cmds.FileArg("value-file", true, false, "A path to a file containing the value to store.").EnableStdin(),
 	},
 	Options: []cmds.Option{
-		cmds.BoolOption(allowOfflineOptionName, "When offline, save the IPNS record to the the local datastore without broadcasting to the network instead of simply failing."),
+		cmds.BoolOption(allowOfflineOptionName, "When offline, save the IPNS record to the local datastore without broadcasting to the network instead of simply failing."),
 	},
 	Run: func(req *cmds.Request, res cmds.ResponseEmitter, env cmds.Environment) error {
 		api, err := cmdenv.GetApi(env, req)

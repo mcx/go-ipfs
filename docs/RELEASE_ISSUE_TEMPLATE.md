@@ -1,4 +1,4 @@
-<!-- Last updated during [v0.26.0 release](https://github.com/ipfs/kubo/issues/10259) -->
+<!-- Last updated during [v0.30.0 release](https://github.com/ipfs/kubo/pull/10496) -->
 
 # Items to do upon creating the release issue
 

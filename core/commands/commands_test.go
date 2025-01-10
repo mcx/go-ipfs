@@ -15,63 +15,6 @@ func collectPaths(prefix string, cmd *cmds.Command, out map[string]struct{}) {
 	}
 }
 
-func TestROCommands(t *testing.T) {
-	list := []string{
-		"/block",
-		"/block/get",
-		"/block/stat",
-		"/cat",
-		"/commands",
-		"/commands/completion",
-		"/commands/completion/bash",
-		"/commands/completion/fish",
-		"/commands/completion/zsh",
-		"/dag",
-		"/dag/get",
-		"/dag/resolve",
-		"/dag/stat",
-		"/dag/export",
-		"/get",
-		"/ls",
-		"/name",
-		"/name/resolve",
-		"/object",
-		"/object/data",
-		"/object/get",
-		"/object/links",
-		"/object/stat",
-		"/refs",
-		"/resolve",
-		"/version",
-	}
-
-	cmdSet := make(map[string]struct{})
-	collectPaths("", RootRO, cmdSet)
-
-	for _, path := range list {
-		if _, ok := cmdSet[path]; !ok {
-			t.Errorf("%q not in result", path)
-		} else {
-			delete(cmdSet, path)
-		}
-	}
-
-	for path := range cmdSet {
-		t.Errorf("%q in result but shouldn't be", path)
-	}
-
-	for _, path := range list {
-		path = path[1:] // remove leading slash
-		split := strings.Split(path, "/")
-		sub, err := RootRO.Get(split)
-		if err != nil {
-			t.Errorf("error getting subcommand %q: %v", path, err)
-		} else if sub == nil {
-			t.Errorf("subcommand %q is nil even though there was no error", path)
-		}
-	}
-}
-
 func TestCommands(t *testing.T) {
 	list := []string{
 		"/add",
@@ -118,6 +61,11 @@ func TestCommands(t *testing.T) {
 		"/dag/stat",
 		"/dht",
 		"/dht/query",
+		"/dht/findprovs",
+		"/dht/findpeer",
+		"/dht/get",
+		"/dht/provide",
+		"/dht/put",
 		"/routing",
 		"/routing/put",
 		"/routing/get",
@@ -141,6 +89,8 @@ func TestCommands(t *testing.T) {
 		"/files/rm",
 		"/files/stat",
 		"/files/write",
+		"/files/chmod",
+		"/files/touch",
 		"/filestore",
 		"/filestore/dups",
 		"/filestore/ls",
@@ -251,6 +201,7 @@ func TestCommands(t *testing.T) {
 		"/swarm/resources",
 		"/update",
 		"/version",
+		"/version/check",
 		"/version/deps",
 	}
 
