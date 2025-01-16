@@ -112,7 +112,7 @@ func TestAllRootCommandsAreMentionedInHelpText(t *testing.T) {
 
 	// a few base commands are not expected to be in the help message
 	// but we default to requiring them to be in the help message, so that we
-	// have to make an conscious decision to exclude them
+	// have to make a conscious decision to exclude them
 	notInHelp := map[string]bool{
 		"object":   true,
 		"shutdown": true,
@@ -147,7 +147,6 @@ func TestCommandDocsWidth(t *testing.T) {
 		"ipfs swarm addrs listen":       true,
 		"ipfs dag resolve":              true,
 		"ipfs dag get":                  true,
-		"ipfs object stat":              true,
 		"ipfs pin remote add":           true,
 		"ipfs config show":              true,
 		"ipfs config edit":              true,
@@ -164,8 +163,6 @@ func TestCommandDocsWidth(t *testing.T) {
 		"ipfs object diff":              true,
 		"ipfs object patch add-link":    true,
 		"ipfs name":                     true,
-		"ipfs object patch append-data": true,
-		"ipfs object patch set-data":    true,
 		"ipfs diag profile":             true,
 		"ipfs diag cmds":                true,
 		"ipfs swarm addrs local":        true,

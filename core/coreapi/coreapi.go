@@ -130,12 +130,6 @@ func (api *CoreAPI) Pin() coreiface.PinAPI {
 	return (*PinAPI)(api)
 }
 
-// nolint deprecated
-// Deprecated: use [CoreAPI.Routing] instead.
-func (api *CoreAPI) Dht() coreiface.DhtAPI {
-	return (*DhtAPI)(api)
-}
-
 // Swarm returns the SwarmAPI interface implementation backed by the go-ipfs node
 func (api *CoreAPI) Swarm() coreiface.SwarmAPI {
 	return (*SwarmAPI)(api)
@@ -213,18 +207,18 @@ func (api *CoreAPI) WithOptions(opts ...options.ApiOption) (coreiface.CoreAPI, e
 		return nil
 	}
 
-	if settings.Offline {
-		cfg, err := n.Repo.Config()
-		if err != nil {
-			return nil, err
-		}
+	cfg, err := n.Repo.Config()
+	if err != nil {
+		return nil, err
+	}
 
+	if settings.Offline {
 		cs := cfg.Ipns.ResolveCacheSize
 		if cs == 0 {
 			cs = node.DefaultIpnsCacheSize
 		}
 		if cs < 0 {
-			return nil, fmt.Errorf("cannot specify negative resolve cache size")
+			return nil, errors.New("cannot specify negative resolve cache size")
 		}
 
 		nsOptions := []namesys.Option{
@@ -250,7 +244,9 @@ func (api *CoreAPI) WithOptions(opts ...options.ApiOption) (coreiface.CoreAPI, e
 
 	if settings.Offline || !settings.FetchBlocks {
 		subAPI.exchange = offlinexch.Exchange(subAPI.blockstore)
-		subAPI.blocks = bserv.New(subAPI.blockstore, subAPI.exchange)
+		subAPI.blocks = bserv.New(subAPI.blockstore, subAPI.exchange,
+			bserv.WriteThrough(cfg.Datastore.WriteThrough.WithDefault(config.DefaultWriteThrough)),
+		)
 		subAPI.dag = dag.NewDAGService(subAPI.blocks)
 	}
 

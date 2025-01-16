@@ -208,6 +208,7 @@ func (n *Node) Init(ipfsArgs ...string) *Node {
 		cfg.Addresses.Gateway = []string{n.GatewayListenAddr.String()}
 		cfg.Swarm.DisableNatPortMap = true
 		cfg.Discovery.MDNS.Enabled = n.EnableMDNS
+		cfg.Routing.LoopbackAddressesOnLanDHT = config.True
 	})
 	return n
 }
@@ -349,6 +350,17 @@ func (n *Node) checkAPI(authorization string) bool {
 		log.Debugf("node %d API addr not available yet: %s", n.ID, err.Error())
 		return false
 	}
+
+	if unixAddr, err := apiAddr.ValueForProtocol(multiaddr.P_UNIX); err == nil {
+		parts := strings.SplitN(unixAddr, "/", 2)
+		if len(parts) < 1 {
+			panic("malformed unix socket address")
+		}
+		fileName := "/" + parts[1]
+		_, err := os.Stat(fileName)
+		return !errors.Is(err, fs.ErrNotExist)
+	}
+
 	ip, err := apiAddr.ValueForProtocol(multiaddr.P_IP4)
 	if err != nil {
 		panic(err)

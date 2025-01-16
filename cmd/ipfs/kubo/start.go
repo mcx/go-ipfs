@@ -303,7 +303,10 @@ func makeExecutor(req *cmds.Request, env interface{}) (cmds.Executor, error) {
 	}
 
 	// Resolve the API addr.
-	apiAddr, err = resolveAddr(req.Context, apiAddr)
+	//
+	// Do not replace apiAddr with the resolved addr so that the requested
+	// hostname is kept for use in the request's HTTP header.
+	_, err = resolveAddr(req.Context, apiAddr)
 	if err != nil {
 		return nil, err
 	}
@@ -327,6 +330,11 @@ func makeExecutor(req *cmds.Request, env interface{}) (cmds.Executor, error) {
 	switch network {
 	case "tcp", "tcp4", "tcp6":
 		tpt = http.DefaultTransport
+		// RPC over HTTPS requires explicit schema in the address passed to cmdhttp.NewClient
+		httpAddr := apiAddr.String()
+		if !strings.HasPrefix(host, "http:") && !strings.HasPrefix(host, "https:") && (strings.Contains(httpAddr, "/https") || strings.Contains(httpAddr, "/tls/http")) {
+			host = "https://" + host
+		}
 	case "unix":
 		path := host
 		host = "unix"

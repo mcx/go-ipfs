@@ -15,13 +15,19 @@ import (
 var ErrNotDHT = errors.New("routing service is not a DHT")
 
 var DhtCmd = &cmds.Command{
+	Status: cmds.Deprecated,
 	Helptext: cmds.HelpText{
 		Tagline:          "Issue commands directly through the DHT.",
 		ShortDescription: ``,
 	},
 
 	Subcommands: map[string]*cmds.Command{
-		"query": queryDhtCmd,
+		"query":     queryDhtCmd,
+		"findprovs": RemovedDHTCmd,
+		"findpeer":  RemovedDHTCmd,
+		"get":       RemovedDHTCmd,
+		"put":       RemovedDHTCmd,
+		"provide":   RemovedDHTCmd,
 	},
 }
 
@@ -32,6 +38,7 @@ type kademlia interface {
 }
 
 var queryDhtCmd = &cmds.Command{
+	Status: cmds.Deprecated,
 	Helptext: cmds.HelpText{
 		Tagline:          "Find the closest Peer IDs to a given Peer ID by querying the DHT.",
 		ShortDescription: "Outputs a list of newline-delimited Peer IDs.",
@@ -71,7 +78,7 @@ var queryDhtCmd = &cmds.Command{
 		}
 
 		if d, ok := client.(kademlia); !ok {
-			return fmt.Errorf("dht client does not support GetClosestPeers")
+			return errors.New("dht client does not support GetClosestPeers")
 		} else {
 			errCh := make(chan error, 1)
 			go func() {
@@ -113,4 +120,13 @@ var queryDhtCmd = &cmds.Command{
 		}),
 	},
 	Type: routing.QueryEvent{},
+}
+var RemovedDHTCmd = &cmds.Command{
+	Status: cmds.Removed,
+	Helptext: cmds.HelpText{
+		Tagline: "Removed, use 'ipfs routing' instead.",
+	},
+	Run: func(req *cmds.Request, res cmds.ResponseEmitter, env cmds.Environment) error {
+		return errors.New("removed, use 'ipfs routing' instead")
+	},
 }
